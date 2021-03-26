@@ -1,6 +1,9 @@
 package com.appinventor.ai_Robi_buet38.SMARTDRIVERBD;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -177,7 +180,20 @@ public class MemberRegistration extends AppCompatActivity implements AdapterView
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+    private  void showAlertDialog(String title, String message, final boolean isSuccess) {
+        new AlertDialog.Builder(this).setTitle(title).setMessage(message).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(!isSuccess){
+                    dialogInterface.dismiss();
+                }else{
+                    startActivity(new Intent(MemberRegistration.this, MainActivity.class));
+                    dialogInterface.dismiss();
+                }
 
+            }
+        }).create().show();
+    }
     private   void registerProcess() {
         StringRequest stringRequest=new StringRequest(Request.Method.POST, mregisterrequesturl,
                 new Response.Listener<String>() {
@@ -187,12 +203,12 @@ public class MemberRegistration extends AppCompatActivity implements AdapterView
                             JSONObject jsonObject=new JSONObject(response);
                             String result=jsonObject.getString("result");
                             if(result.equals("Success")){
-
+                                showAlertDialog("Successful", "Your registration successful.", true);
                                 Toast.makeText(MemberRegistration.this,"You registered Successfully"+result,Toast.LENGTH_LONG).show();
                             }
                             else{
 
-
+                                showAlertDialog("Error", "Something went wrong. Please try again.", false);
                                 Toast.makeText(MemberRegistration.this,"Error Occured"+result,Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
@@ -202,7 +218,7 @@ public class MemberRegistration extends AppCompatActivity implements AdapterView
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                showAlertDialog("Error", "Something went wrong. Please try again.", false);
                 Toast.makeText(MemberRegistration.this,"Error Occured"+error.toString(),Toast.LENGTH_LONG).show();
 
             }

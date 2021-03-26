@@ -1,7 +1,10 @@
 package com.appinventor.ai_Robi_buet38.SMARTDRIVERBD;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.icu.util.Calendar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -135,6 +138,7 @@ public class DriverRegistration extends AppCompatActivity implements  AdapterVie
         driver_sign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //showAlertDialog("Test", "Test description", false);
                 registerProcess();
             }
         });
@@ -182,8 +186,22 @@ public class DriverRegistration extends AppCompatActivity implements  AdapterVie
 
     }
 
+    private  void showAlertDialog(String title, String message, final boolean isSuccess) {
+        new AlertDialog.Builder(this).setTitle(title).setMessage(message).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(!isSuccess){
+                    dialogInterface.dismiss();
+                }else{
+                    startActivity(new Intent(DriverRegistration.this, MainActivity.class));
+                    dialogInterface.dismiss();
+                }
 
-    private   void registerProcess() {
+            }
+        }).create().show();
+    }
+
+    private  void registerProcess() {
         StringRequest stringRequest=new StringRequest(Request.Method.POST, driverregisterurl,
                 new Response.Listener<String>() {
                     @Override
@@ -192,12 +210,12 @@ public class DriverRegistration extends AppCompatActivity implements  AdapterVie
                             JSONObject jsonObject=new JSONObject(response);
                             String result=jsonObject.getString("result");
                             if(result.equals("Success")){
-
+                                showAlertDialog("Successful", "Your registration successful.", true);
                                 Toast.makeText(DriverRegistration.this,"You registered"+result,Toast.LENGTH_LONG).show();
                             }
                             else{
 
-
+                                showAlertDialog("Error", "Something went wrong. Please try again.", false);
                                 Toast.makeText(DriverRegistration.this,"Error Occured"+result,Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
@@ -207,7 +225,7 @@ public class DriverRegistration extends AppCompatActivity implements  AdapterVie
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                showAlertDialog("Error", "Something went wrong. Please try again.", false);
                 Toast.makeText(DriverRegistration.this,"Error Occured"+error.toString(),Toast.LENGTH_LONG).show();
 
             }

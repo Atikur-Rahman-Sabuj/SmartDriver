@@ -1,7 +1,10 @@
 package com.appinventor.ai_Robi_buet38.SMARTDRIVERBD;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.icu.util.Calendar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -246,6 +249,21 @@ public class OwnerRegistration extends AppCompatActivity implements AdapterView.
         Toast.makeText(this, ""+date, Toast.LENGTH_SHORT).show();
     }
 
+    private  void showAlertDialog(String title, String message, final boolean isSuccess) {
+        new AlertDialog.Builder(this).setTitle(title).setMessage(message).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(!isSuccess){
+                    dialogInterface.dismiss();
+                }else{
+                    startActivity(new Intent(OwnerRegistration.this, MainActivity.class));
+                    dialogInterface.dismiss();
+                }
+
+            }
+        }).create().show();
+    }
+
     private   void registerProcess() {
         StringRequest stringRequest=new StringRequest(Request.Method.POST, registerrequesturl,
                 new Response.Listener<String>() {
@@ -255,12 +273,12 @@ public class OwnerRegistration extends AppCompatActivity implements AdapterView.
                             JSONObject jsonObject=new JSONObject(response);
                             String result=jsonObject.getString("result");
                             if(result.equals("Success")){
-
+                                showAlertDialog("Successful", "Your registration successful.", true);
                                 Toast.makeText(OwnerRegistration.this,"You registered"+result,Toast.LENGTH_LONG).show();
                             }
                             else{
 
-
+                                showAlertDialog("Error", "Something went wrong. Please try again.", false);
                                 Toast.makeText(OwnerRegistration.this,"Error Occured"+result,Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
@@ -270,7 +288,7 @@ public class OwnerRegistration extends AppCompatActivity implements AdapterView.
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                showAlertDialog("Error", "Something went wrong. Please try again.", false);
                 Toast.makeText(OwnerRegistration.this,"Error Occured"+error.toString(),Toast.LENGTH_LONG).show();
 
             }
